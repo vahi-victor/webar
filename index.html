@@ -3,6 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <title>MindAR Multi-Character (Single Marker)</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
     <script src="https://cdn.jsdelivr.net/npm/aframe@1.2.0/dist/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.3/dist/mindar-image-aframe.prod.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
@@ -20,7 +21,7 @@
       device-orientation-permission-ui="enabled: false"
     >
       <a-assets>
-        <a-asset-item id="char1" src="./resources/boy.glb"></a-asset-item>
+        <a-asset-item id="char1" src="./resources/rig_anim2.glb"></a-asset-item>
       </a-assets>
 
       <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
@@ -34,19 +35,13 @@
           position="0 -0.3 0.6"
           rotation="0 75 0"
           scale="0.7 0.7 0.7"
-          animation-mixer="clip: * ; loop: true"
+          animation-mixer="clip: * ; loop: repeat"
           animation="property: position; to: 0.4 -0.3 0.6;dur: 11000; easing: easeInOutQuad; loop: true;"
         ></a-gltf-model>
 
 
       </a-entity>
     </a-scene>
-
-    
-    <script src="https://cdn.jsdelivr.net/npm/mindar.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/loaders/FBXLoader.js"></script>
-
     <script>
       const marker1 = document.querySelector("#marker1");
       const model1 = document.querySelector("#model1");
