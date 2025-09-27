@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>MindAR Multi-Character (One Marker)</title>
+    <script src="https://cdn.jsdelivr.net/npm/aframe@1.2.0/dist/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.3/dist/mindar-image-aframe.prod.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
+
+    <style>
+      body { margin: 0; overflow: hidden; }
+    </style>
+  </head>
+  <body>
+    <a-scene
+      mindar-image="imageTargetSrc: ./assets/targets.mind;"
+      color-space="sRGB"
+      renderer="colorManagement: true, physicallyCorrectLights"
+      vr-mode-ui="enabled: false"
+      device-orientation-permission-ui="enabled: false"
+    >
+      <a-assets>
+       
+        <a-asset-item id="char1" src="./assets/rig_anim2.glb"></a-asset-item>
+      </a-assets>
+
+      <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+
+      <!-- Marker (one image target) -->
+      <a-entity id="marker1" mindar-image-target="targetIndex: 0">
+        
+        <a-gltf-model
+          id="model1"
+          src="#char1"
+          position="0 -0.3 0.6"
+          rotation="0 75 0"
+          scale="0.7 0.7 0.7"
+          animation-mixer="clip: * ; loop: true"
+          animation="property: position; to: 0.4 -0.3 0.6;dur: 11000; easing: easeInOutQuad; loop: true;"
+        ></a-gltf-model>
+
+
+      </a-entity>
+    </a-scene>
+
+    
+    <script src="https://cdn.jsdelivr.net/npm/mindar.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/loaders/FBXLoader.js"></script>
+
+    <script>
+      const marker1 = document.querySelector("#marker1");
+      const model1 = document.querySelector("#model1");
+      
+      
+      marker1.addEventListener("targetFound", () => {
+  model1.setAttribute("animation-mixer", "clip: *; loop: repeat");
+});
+
+marker1.addEventListener("targetLost", () => {
+  model1.removeAttribute("animation-mixer");
+});
+
+    </script>
+  </body>
+</html>
