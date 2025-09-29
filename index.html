@@ -2,17 +2,60 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>MindAR Multi-Character (Single Marker)</title>
+    <title>GNIP AR Test</title>
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- CSS style importing -->
+    <link rel="stylesheet" href="style.css">
+
+  <!-- GSAP -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+
+    <!-- AR liberaries CDN importing -->
     <script src="https://cdn.jsdelivr.net/npm/aframe@1.2.0/dist/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.3/dist/mindar-image-aframe.prod.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
 
-    <style>
-      body { margin: 0; overflow: hidden; }
-    </style>
   </head>
   <body>
+    <!-- Welcome screen -->
+    <div id="welcome-screen">
+      <div class="star" style="top: 10%; left: 10%;">⭐</div>
+      <div class="star" style="top: 20%; right: 15%; animation-delay: 1s;">✨</div>
+      <div class="star" style="bottom: 15%; left: 20%; animation-delay: 0.5s;">🌟</div>
+      <div class="star" style="bottom: 25%; right: 10%; animation-delay: 1.5s;">⭐</div>
+      
+      <h1>🌈 Welcome to Story Land! 🌈</h1>
+      <button id="welcome-btn">✨ Start Adventure ✨</button>
+    </div>
+
+    <!-- Story content -->
+    <div id="content">
+      <div class="story-card">
+        <div class="title">📖 The Jungle Tale</div>
+        <p id="story" class="story">
+          Im Wald, wo Baum an Baume nah steht,
+          dort, wo die Blätter nur flüstern, das
+          Eichhörnchen lebt.
+          Sammy heißt es, ist flink und rot-braun,
+          und trägt emsig Nüsse in seinen Bau.
+        </p>
+      </div>
+      <button id="ar-button">🎯 Touch Your Dreams 🎯</button>
+    </div>
+
+    <!-- Back button for AR scene -->
+    <button id="back-button">← Back to Story</button>
+
+    <!-- Narrator and background music -->
+    <audio id="narrator" src="./resources/narrator.mp3" preload="auto" playsinline></audio>
+    <audio id="bg" src="./resources/ambient.mp3" preload="auto" playsinline loop></audio>
+
     <a-scene
       mindar-image="imageTargetSrc: ./assets/targets.mind;"
       color-space="sRGB"
@@ -21,10 +64,11 @@
       device-orientation-permission-ui="enabled: false"
     >
       <a-assets>
-        <a-asset-item id="char1" src="./assets/rig_anim2.glb"></a-asset-item>
+        <a-asset-item id="char1" src="./resources/rig_anim3.glb"></a-asset-item>
+        <a-asset-item id="char2" src="./resources/tree.glb"></a-asset-item>
       </a-assets>
 
-      <a-camera id="camera1" position="0 -2 0" look-controls="enabled: true"></a-camera>
+      <a-camera id="camera1" position="0 0 0" look-controls="enabled: false "></a-camera>
 
       <!-- Marker (one image target) -->
       <a-entity id="marker1" mindar-image-target="targetIndex: 0">
@@ -34,136 +78,116 @@
           src="#char1"
           position="-0.2 -0.36 0"  
           rotation="0 75 0"
-          scale="1 1 1"     
-           
+          scale="0.8 0.8 0.8"     
+          animation="property: position; to: 0.1 -0.36 0; dur: 10000; easing: easeInOutQuad; loop: true"></a-gltf-model>
         ></a-gltf-model>
+
+         <a-gltf-model
+          id="model2"
+          src="#char2"
+          position="0.1 -0.35 0.2"
+          rotation="0 310 0"
+          scale="0.3 0.5 0.3"
+        ></a-gltf-model>
+
       </a-entity>
     </a-scene>
 
-    <script>
-const camera = document.querySelector("#camera1");
+  <script>
+    const marker1 = document.querySelector("#marker1");
+    const model1 = document.querySelector("#model1");
+          
+          
+      marker1.addEventListener("targetFound", () => {
+      model1.setAttribute("animation-mixer", "clip: *; loop: repeat; startAt: 0.04");
+    });
 
-var a = 0;
-  let smoothPos = new THREE.Vector3();
-  let smoothRot = new THREE.Euler();
-  const lerpFactor = 0.1; // smaller = smoother, slower response
-
-  function update() {
-            // targetPos = new THREE.Vector3();
-
-    // MindAR updates model.object3D every frame automatically
-    // const targetPos =
-    const targetPos = camera.object3D.getWorldPosition(camera.object3D.position);
-    const targetRot = camera.object3D.rotation.clone();
-
-     if (a++ % 120 == 0)
-         alert('a ' + targetPos.x + ' ' + targetPos.y + ' ' + targetPos.z);
-
-// Smooth position
-    smoothPos.lerp(targetPos, lerpFactor);
-
-    camera.object3D.position.copy(smoothPos);
-
-    // Smooth rotation
-    smoothRot.x += (targetRot.x - smoothRot.x) * lerpFactor;
-    smoothRot.y += (targetRot.y - smoothRot.y) * lerpFactor;
-    smoothRot.z += (targetRot.z - smoothRot.z) * lerpFactor;
-    camera.object3D.rotation.copy(smoothRot);
-
-    requestAnimationFrame(update);
-  }
-
-  update(); // start smoothing loop
+    marker1.addEventListener("targetLost", () => {
+    model1.removeAttribute("animation-mixer");
+    });
 
 
+    // Elements
+      const welcomeBtn = document.getElementById('welcome-btn');
+      const welcomeScreen = document.getElementById('welcome-screen');
+      const content = document.getElementById('content');
+      const arButton = document.getElementById('ar-button');
+      const backButton = document.getElementById('back-button');
+      const arScene = document.getElementById('ar-scene');
+      const narrator = document.getElementById('narrator');
+      const bg = document.getElementById('bg');
+      const storyEl = document.getElementById('story');
+     
+      // Split story into words for GSAP animation
+      const words = storyEl.innerText.trim().split(/\s+/);
+      storyEl.innerHTML = '';
+      words.forEach(word => {
+        const span = document.createElement('span');
+        span.className = 'word';
+        span.textContent = word;
+        storyEl.appendChild(span);
+        storyEl.appendChild(document.createTextNode(' ')); // Add space after each word
+      });
 
-// const model = document.querySelector("#model1");
-// const camera = document.querySelector("#camera1");
+      // Simple fade-in animation
+      const tl = gsap.timeline({ 
+        onComplete: () => {
+          // Show AR button after animation completes
+          arButton.style.display = 'block';
+        }
+      });
 
-// var a = 0;
-//   // Current smoothed position & rotation
-//   let smoothPos = new THREE.Vector3();
-//   let smoothRot = new THREE.Euler();
-//   const lerpFactor = 0.1; // smaller = smoother, slower response
+      // Set initial state - invisible
+      gsap.set('.word', { 
+        opacity: 0
+      });
 
-//   function update() {
-//     // MindAR updates model.object3D every frame automatically
-//     const targetPos = model.object3D.position.clone();
-//     const targetRot = model.object3D.rotation.clone();
+      // Count words to calculate stagger time
+      const wordCount = document.querySelectorAll('.word').length;
+      const totalDuration = 12; // 12 seconds total
+      const staggerTime = totalDuration / wordCount;
 
-//     // Smooth position
-//     smoothPos.lerp(targetPos, lerpFactor);
+      tl.to('.word', {
+        opacity: 1,
+        duration: 0.5,
+        stagger: staggerTime,
+        ease: "power1.inOut"
+      });
+      
+      tl.pause();
 
-//     if (a++ % 120 == 0)
-//         alert('a' + targetPos.x + ' ' + targetPos.y + ' ' + targetPos.z);
+      // Handle welcome button click
+      welcomeBtn.addEventListener('click', async () => {
+        welcomeScreen.style.display = 'none';
+        content.style.display = 'block';
 
+        bg.volume = 0.08;
+        narrator.volume = 1.0;
 
-//     model.object3D.position.copy(smoothPos);
+        try {
+          await bg.play();
+          await narrator.play();
+        } catch(e) {
+          console.log("Error starting audio:", e);
+        }
 
-//     // Smooth rotation
-//     smoothRot.x += (targetRot.x - smoothRot.x) * lerpFactor;
-//     smoothRot.y += (targetRot.y - smoothRot.y) * lerpFactor;
-//     smoothRot.z += (targetRot.z - smoothRot.z) * lerpFactor;
-//     model.object3D.rotation.copy(smoothRot);
+        tl.restart();
+      });
 
-//     requestAnimationFrame(update);
-//   }
+      // Handle AR button click
+      arButton.addEventListener('click', () => {
+        content.style.display = 'none';
+        arScene.classList.add('active');
+        backButton.style.display = 'block';
+      });
 
-//   update(); // start smoothing loop
+      // Handle back button click
+      backButton.addEventListener('click', () => {
+        arScene.classList.remove('active');
+        backButton.style.display = 'none';
+        content.style.display = 'block';
+      });
 
-
-
-//       const marker1 = document.querySelector("#marker1");
-//       const model1 = document.querySelector("#model1");
-
-// let lastPosition = { x: 0, y: 0, z: 0 };
-//   let deadZone = 1.9; // Threshold to avoid small position jumps
-
-//   marker1.addEventListener("targetFound", () => {
-//     let currentPosition = marker1.object3D.position;
-
-//     alert(currentPosition.x + ' ' + currentPosition.y + ' ' + currentPosition.z + ' ' + lastPosition.x + ' ' + lastPosition.y + ' ' + lastPosition.z);
-
-//     // Only update if the position has changed significantly (above the dead zone)
-//     if (Math.abs(currentPosition.x - lastPosition.x) > deadZone || 
-//         Math.abs(currentPosition.y - lastPosition.y) > deadZone || 
-//         Math.abs(currentPosition.z - lastPosition.z) > deadZone) {
-//       // model1.setAttribute('position', currentPosition);  // Update the model's position
-//       lastPosition = { x: currentPosition.x, y: currentPosition.y, z: currentPosition.z };
-//     }
-//     else {
-//       model1.setAttribute('position', lastPosition);  // Update the model's position
-//     }
-//   });
-
-
-
-      // let debounceTimeout;
-      // let lastDetected = false;  // Track the last detection state
-
-      // marker1.addEventListener("targetFound", () => {
-      //   // Debounce the targetFound event to avoid rapid firing
-      //   clearTimeout(debounceTimeout);
-      //   debounceTimeout = setTimeout(() => {
-      //     if (!lastDetected) {
-      //       // Only trigger when the target has been detected after a pause
-      //       model1.setAttribute("animation-mixer", "clip: *; loop: repeat");
-      //       lastDetected = true;
-      //     }
-      //   }, 10000);  // Adjust this delay for smoother detection (in ms)
-      // });
-
-      // marker1.addEventListener("targetLost", () => {
-      //   // Debounce the targetLost event
-      //   clearTimeout(debounceTimeout);
-      //   debounceTimeout = setTimeout(() => {
-      //     if (lastDetected) {
-      //       // Only trigger when the target has been lost after a pause
-      //       model1.removeAttribute("animation-mixer");
-      //       lastDetected = false;
-      //     }
-      //   }, 10000);  // Adjust this delay for smoother detection (in ms)
-      // });
-    </script>
+  </script>
   </body>
 </html>
