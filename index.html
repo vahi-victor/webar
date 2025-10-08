@@ -1,193 +1,193 @@
 <!DOCTYPE html>
-<html>
+<html lang="fa">
   <head>
     <meta charset="utf-8" />
     <title>GNIP AR Test</title>
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
 
-  <!-- Bootstrap 5 -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- Bootstrap JS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- A-Frame + Extras -->
+    <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.6.0/dist/aframe-extras.min.js"></script>
 
-    <!-- CSS style importing -->
-    <link rel="stylesheet" href="style.css">
+    <!-- Stats.js for MindAR debug overlay -->
+    <script src="https://cdn.jsdelivr.net/gh/mrdoob/stats.js/build/stats.min.js"></script>
 
-  <!-- GSAP -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <!-- MindAR Image Tracking for A-Frame -->
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
 
-    <!-- AR liberaries CDN importing -->
-    <script src="https://cdn.jsdelivr.net/npm/aframe@1.2.0/dist/aframe.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.3/dist/mindar-image-aframe.prod.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
+    <style>
+      body { margin: 0; overflow: hidden; }
+      #debug-box {
+        position: fixed;
+        top: 10px;
+        left: 10px;
+        background: rgba(0, 0, 0, 0.8);
+        color: #00ff00;
+        padding: 10px 15px;
+        font-family: monospace;
+        font-size: 12px;
+        z-index: 9999;
+        max-width: 350px;
+        max-height: 250px;
+        overflow-y: auto;
+        border: 1px solid #00ff00;
+        border-radius: 6px;
+      }
+      #debug-box div { margin: 2px 0; }
 
+      a-scene {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+      }
+    </style>
   </head>
+
   <body>
-    <!-- Welcome screen -->
-    <div id="welcome-screen">
-      <div class="star" style="top: 10%; left: 10%;">⭐</div>
-      <div class="star" style="top: 20%; right: 15%; animation-delay: 1s;">✨</div>
-      <div class="star" style="bottom: 15%; left: 20%; animation-delay: 0.5s;">🌟</div>
-      <div class="star" style="bottom: 25%; right: 10%; animation-delay: 1.5s;">⭐</div>
-      
-      <h1>🌈 Welcome to Story Land! 🌈</h1>
-      <button id="welcome-btn">✨ Start Adventure ✨</button>
+    <!-- Debug Console -->
+    <div id="debug-box">
+      <strong>Debug Console:</strong>
     </div>
 
-    <!-- Story content -->
-    <div id="content">
-      <div class="story-card">
-        <div class="title">📖 The Jungle Tale</div>
-        <p id="story" class="story">
-          Im Wald, wo Baum an Baume nah steht,
-          dort, wo die Blätter nur flüstern, das
-          Eichhörnchen lebt.
-          Sammy heißt es, ist flink und rot-braun,
-          und trägt emsig Nüsse in seinen Bau.
-        </p>
-      </div>
-      <button id="ar-button">🎯 Touch Your Dreams 🎯</button>
-    </div>
-
-    <!-- Back button for AR scene -->
-    <button id="back-button">← Back to Story</button>
-
-    <!-- Narrator and background music -->
-    <audio id="narrator" src="./resources/narrator.mp3" preload="auto" playsinline></audio>
-    <audio id="bg" src="./resources/ambient.mp3" preload="auto" playsinline loop></audio>
-
+    <!-- AR Scene -->
     <a-scene
-      mindar-image="imageTargetSrc: ./assets/targets.mind;"
-      color-space="sRGB"
-      renderer="colorManagement: true, physicallyCorrectLights"
+      id="scene"
+      renderer="colorManagement: true; physicallyCorrectLights: true"
+      mindar-image="imageTargetSrc: ./assets/targets.mind; filterMinCF: 0.0005; filterBeta: 0.1; showStats: true"
       vr-mode-ui="enabled: false"
       device-orientation-permission-ui="enabled: false"
-    >
+      color-space="sRGB"    >
+
+      <!-- دوربین -->
+      <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+
+      <!-- نور محیط -->
+      <a-entity light="type: ambient; intensity: 0.8"></a-entity>
+
+      <!-- منابع مدل‌ها -->
       <a-assets>
-        <a-asset-item id="char1" src="./resources/rig_anim2.glb"></a-asset-item>
-        <!-- <a-asset-item id="char2" src="./resources/tree.glb"></a-asset-item> -->
+        <a-asset-item id="minecraft" src="assets/minecraft.glb"></a-asset-item>
+        <a-asset-item id="squirrle" src="assets/rig_anim2.glb"></a-asset-item>
       </a-assets>
 
-      <a-camera id="camera1" position="0 0 0" look-controls="enabled: false "></a-camera>
 
-      <!-- Marker (one image target) -->
-      <a-entity id="marker1" mindar-image-target="targetIndex: 0">
-        
-        <a-gltf-model
-          id="model1" 
-          src="#char1"
-          position="-0.2 -0.36 0"  
-          rotation="0 75 0"
-          scale="0.8 0.8 0.8"     
-          animation="property: position; to: 0.1 -0.36 0; dur: 10000; easing: easeInOutQuad; loop: true"></a-gltf-model>
-        ></a-gltf-model>
+      <a-entity mindar-image-target="targetIndex: 0">
+        <!-- مدل Minecraft -->
+        <a-entity
+          id="test"
+          class="clickable"
+          gltf-model="#minecraft"
+          position="-0.363 -01 -5.265"
+          rotation="-30 180 0"
+          scale="0.3 0.3 0.3"
+          rotation="0 180 0"
+          animation__front="property: position; to:0.163 2.632 5.265; dur: 11000; dir: alternate; startEvents: movefrontmine"></a-entity>>
+        </a-entity>
 
-         <!-- <a-gltf-model
-          id="model2"
-          src="#char2"
-          position="0.1 -0.35 0.2"
-          rotation="0 310 0"
-          scale="0.2 0.3 0.3"
-        ></a-gltf-model> -->
+        <!-- مدل Squirrel -->
+        <a-entity
+          id="t2"
+          class="clickable"
+          gltf-model="#squirrle"
+          position="0 0 0"
+          rotation="5.354 34.967 12.784"
+          scale="0.005 0.005 0.005"
+          animation-mixer
+          animation__right="property: position; to: 0.364 0.1 -1.304; dur: 10000; startEvents: moveright"
+          animation__front="property: position; to:-0.364 0.1 -1.304; dur: 10000; dir: alternate; startEvents: movefront">
+        </a-entity>
 
       </a-entity>
+
     </a-scene>
 
-  <script>
-    const marker1 = document.querySelector("#marker1");
-    const model1 = document.querySelector("#model1");
-          
-          
-      marker1.addEventListener("targetFound", () => {
-      model1.setAttribute("animation-mixer", "clip: *; loop: repeat; startAt: 1.04");
-    });
+    <script>
 
-    marker1.addEventListener("targetLost", () => {
-    model1.removeAttribute("animation-mixer");
-    });
-
-
-    // Elements
-      const welcomeBtn = document.getElementById('welcome-btn');
-      const welcomeScreen = document.getElementById('welcome-screen');
-      const content = document.getElementById('content');
-      const arButton = document.getElementById('ar-button');
-      const backButton = document.getElementById('back-button');
-      const arScene = document.getElementById('ar-scene');
-      const narrator = document.getElementById('narrator');
-      const bg = document.getElementById('bg');
-      const storyEl = document.getElementById('story');
-     
-      // Split story into words for GSAP animation
-      const words = storyEl.innerText.trim().split(/\s+/);
-      storyEl.innerHTML = '';
-      words.forEach(word => {
-        const span = document.createElement('span');
-        span.className = 'word';
-        span.textContent = word;
-        storyEl.appendChild(span);
-        storyEl.appendChild(document.createTextNode(' ')); // Add space after each word
-      });
-
-      // Simple fade-in animation
-      const tl = gsap.timeline({ 
-        onComplete: () => {
-          // Show AR button after animation completes
-          arButton.style.display = 'block';
-        }
-      });
-
-      // Set initial state - invisible
-      gsap.set('.word', { 
-        opacity: 0
-      });
-
-      // Count words to calculate stagger time
-      const wordCount = document.querySelectorAll('.word').length;
-      const totalDuration = 12; // 12 seconds total
-      const staggerTime = totalDuration / wordCount;
-
-      tl.to('.word', {
-        opacity: 1,
-        duration: 0.5,
-        stagger: staggerTime,
-        ease: "power1.inOut"
-      });
       
-      tl.pause();
+      // ---------- Debug Logger ----------
+      const debugBox = document.getElementById("debug-box");
+      function debugLog(msg) {
+        console.log(msg);
+        const div = document.createElement("div");
+        div.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+        debugBox.appendChild(div);
+        debugBox.scrollTop = debugBox.scrollHeight;
+      }
 
-      // Handle welcome button click
-      welcomeBtn.addEventListener('click', async () => {
-        welcomeScreen.style.display = 'none';
-        content.style.display = 'block';
+      debugLog("Script started");
 
-        bg.volume = 0.08;
-        narrator.volume = 1.0;
+      // ---------- Scene Setup ----------
+      const sceneEl = document.querySelector("#scene");
+      sceneEl.addEventListener("loaded", () => {
+        debugLog("Scene loaded. Setting up raycaster...");
 
-        try {
-          await bg.play();
-          await narrator.play();
-        } catch(e) {
-          console.log("Error starting audio:", e);
+        const camera = sceneEl.camera;
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+
+        // مدل‌ها
+        const minecraft = document.querySelector("#test");
+        const squirrel = document.querySelector("#t2");
+        const clips = ["idle", "punch", "walk", "run"];
+        let index = 0;
+        let moveIndex = 0;
+
+        // وقتی مدل Minecraft آماده شد
+        minecraft.addEventListener("model-loaded", () => {
+          minecraft.setAttribute("animation-mixer", "clip: idle");
+          debugLog("Minecraft model loaded");
+        });
+
+        // ---------- تعامل کلیک/لمس ----------
+        function handleInteraction(event) {
+          const rect = sceneEl.canvas.getBoundingClientRect();
+          const x = event.touches ? event.touches[0].clientX : event.clientX;
+          const y = event.touches ? event.touches[0].clientY : event.clientY;
+
+          mouse.x = ((x - rect.left) / rect.width) * 2 - 1;
+          mouse.y = -((y - rect.top) / rect.height) * 2 + 1;
+
+          raycaster.setFromCamera(mouse, camera);
+          const intersects = raycaster.intersectObjects(sceneEl.object3D.children, true);
+
+          if (intersects.length > 0) {
+            const target = intersects[0].object.el;
+            if (!target) return;
+            debugLog(`Tapped: ${target.id}`);
+
+            // Minecraft
+            if (target.id === "test") {
+              index = (index + 1) % clips.length;
+              const clip = clips[index];
+              minecraft.setAttribute("animation-mixer", `clip: ${clip}`);
+              if (clip === "walk") {
+                minecraft.emit("movefrontmine");
+                debugLog("Minecraft → movefrontmine");
+              }
+              debugLog(`Minecraft animation: ${clip}`);
+            }
+
+            // Squirrel
+            if (target.id === "t2") {
+              moveIndex++;
+              if (moveIndex % 2 === 1) {
+                squirrel.emit("moveright");
+                debugLog("Squirrel → moveright");
+              } else {
+                squirrel.emit("movefront");
+                debugLog("Squirrel → movefront");
+              }
+            }
+          }
         }
 
-        tl.restart();
-      });
+        // فقط یک شنونده (تا دوبار اجرا نشود)
+        sceneEl.addEventListener("click", handleInteraction);
 
-      // Handle AR button click
-      arButton.addEventListener('click', () => {
-        content.style.display = 'none';
-        arScene.classList.add('active');
-        backButton.style.display = 'block';
+        debugLog("Raycaster ready (click supported).");
       });
-
-      // Handle back button click
-      backButton.addEventListener('click', () => {
-        arScene.classList.remove('active');
-        backButton.style.display = 'none';
-        content.style.display = 'block';
-      });
-
-  </script>
+    </script>
   </body>
 </html>
