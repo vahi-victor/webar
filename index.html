@@ -79,11 +79,13 @@
           id="test"
           class="clickable"
           gltf-model="#minecraft"
-          position="-0.363 -01 -5.265"
+          position="-0.1 -0.2 -0.3"
           rotation="-30 180 0"
-          scale="0.3 0.3 0.3"
+          scale="0.1 0.1 0.1"
           rotation="0 180 0"
-          animation__front="property: position; to:0.163 2.632 5.265; dur: 11000; dir: alternate; startEvents: movefrontmine"></a-entity>>
+          animation__front="property: position; to:0 -0.2 3; dur: 11000; dir: alternate; startEvents: movefrontmine"
+          animation__scale="property: scale; to:0.1 0.1 0.1; dur: 11000; dir: alternate; startEvents: scalemine"
+          >
         </a-entity>
 
         <!-- مدل Squirrel -->
@@ -91,12 +93,12 @@
           id="t2"
           class="clickable"
           gltf-model="#squirrle"
-          position="0 0 0"
-          rotation="5.354 34.967 12.784"
-          scale="0.005 0.005 0.005"
+          position="-0.2 -0.4 0"
+          rotation="5.354 55 12.784"
+          scale=" 1 1 1"
           animation-mixer
-          animation__right="property: position; to: 0.364 0.1 -1.304; dur: 10000; startEvents: moveright"
-          animation__front="property: position; to:-0.364 0.1 -1.304; dur: 10000; dir: alternate; startEvents: movefront">
+          animation__right="property: position; to: 0.2 -0.4 0; dur: 10000; startEvents: moveright"
+          animation__front="property: rotation; to:5.354 0 13; dur: 8000; dir: alternate; startEvents: movefront">
         </a-entity>
 
       </a-entity>
@@ -164,11 +166,13 @@
               minecraft.setAttribute("animation-mixer", `clip: ${clip}`);
               if (clip === "walk") {
                 minecraft.emit("movefrontmine");
+                minecraft.emit("scalemine");
                 debugLog("Minecraft → movefrontmine");
               }
               debugLog(`Minecraft animation: ${clip}`);
             }
 
+            
             // Squirrel
             if (target.id === "t2") {
               moveIndex++;
