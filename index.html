@@ -64,8 +64,8 @@
       device-orientation-permission-ui="enabled: false"
     >
       <a-assets>
-        <a-asset-item id="char1" src="./resources/rig_anim3.glb"></a-asset-item>
-        <a-asset-item id="char2" src="./resources/tree.glb"></a-asset-item>
+        <a-asset-item id="char1" src="./resources/rig_anim2.glb"></a-asset-item>
+        <!-- <a-asset-item id="char2" src="./resources/tree.glb"></a-asset-item> -->
       </a-assets>
 
       <a-camera id="camera1" position="0 0 0" look-controls="enabled: false "></a-camera>
@@ -82,13 +82,13 @@
           animation="property: position; to: 0.1 -0.36 0; dur: 10000; easing: easeInOutQuad; loop: true"></a-gltf-model>
         ></a-gltf-model>
 
-         <a-gltf-model
+         <!-- <a-gltf-model
           id="model2"
           src="#char2"
           position="0.1 -0.35 0.2"
           rotation="0 310 0"
-          scale="0.3 0.5 0.3"
-        ></a-gltf-model>
+          scale="0.2 0.3 0.3"
+        ></a-gltf-model> -->
 
       </a-entity>
     </a-scene>
@@ -99,7 +99,7 @@
           
           
       marker1.addEventListener("targetFound", () => {
-      model1.setAttribute("animation-mixer", "clip: *; loop: repeat; startAt: 0.04");
+      model1.setAttribute("animation-mixer", "clip: *; loop: repeat; startAt: 1.04");
     });
 
     marker1.addEventListener("targetLost", () => {
