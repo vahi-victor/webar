@@ -50,7 +50,6 @@
     <div id="debug-box">
       <strong>Debug Console:</strong>
     </div>
-
     <!-- AR Scene -->
     <a-scene
       id="scene"
@@ -71,6 +70,7 @@
         <a-asset-item id="minecraft" src="assets/minecraft.glb"></a-asset-item>
         <a-asset-item id="squirrle" src="resources/sq-multi.glb"></a-asset-item>
         <a-asset-item id="tree" src="resources/tree.glb"></a-asset-item>
+         <a-asset-item id="phoenix" src="resources/phoenix_bird.glb"></a-asset-item>
       </a-assets>
 
 
@@ -110,6 +110,17 @@
           scale="0.3 0.5 0.3">
         </a-entity>
 
+        <!-- phoenix_bird -->
+         <a-entity 
+          id="phoenix_bird"
+          gltf-model="#phoenix"
+          position=" -1 0.3 0"
+          scale="0.0001 0.0001 0.0001"
+          rotation="0 0 0"
+          animation-mixer
+          animation__fly="property: position; to:0.2 0.4 -0.09; dur:18000; dir:alternate; startEvents: flying"
+          animation__flyfront="property: position; to:0.3 0.4 4; dur:12000; dir:alternate; startEvents: flyfront"></a-entity>
+
       </a-entity>
 
     </a-scene>
@@ -142,6 +153,7 @@
         const minecraft = document.querySelector("#test");
         const squirrel = document.querySelector("#t2");
         const tree1 = document.querySelector("#t1");
+        const phoenix = document.querySelector("#phoenix_bird");
 
         const clips = ["idle", "punch", "walk", "run"];
         const clipsq = ["rig|idle-1", "rig|walk-03_remap"];
@@ -160,10 +172,23 @@
           debugLog("Minecraft model loaded");
         });
 
+        phoenix.setAttribute('visible', 'false');
+        debugLog("phoenix visible is false");
+
+        // squirrel model
         squirrel.addEventListener("model-loaded", ()=> {
           squirrel.setAttribute("animation-mixer", "clip: rig|idle-1");
           debugLog("squirrell model loaded");
+          phoenix.setAttribute('visible', 'true');
+          debugLog("phoenix model loaded");
+          phoenix.emit("flying");
+          debugLog("Phoenix flying started");
         });
+        
+        phoenix.addEventListener("animationcomplete__flying", () =>{
+            debugLog("Phoenix finished first flight; switching to flyfront");
+            phoenix.emit("flyfront");
+          });
 
         // ---------- تعامل کلیک/لمس ----------
         function handleInteraction(event) {
@@ -216,18 +241,6 @@
                 debugLog("removed");
               });
              });
-            
-            // Squirrel
-            // if (target.id === "t2") {
-            //   moveIndex++;
-            //   if (moveIndex % 2 === 1) {
-            //     squirrel.emit("moveright");
-            //     debugLog("Squirrel → moveright");
-            //   } else {
-            //     squirrel.emit("movefront");
-            //     debugLog("Squirrel → movefront");
-            //   }
-            // }
           }
         }
 
