@@ -114,12 +114,14 @@
          <a-entity 
           id="phoenix_bird"
           gltf-model="#phoenix"
-          position=" -1 0.3 0"
-          scale="0.0001 0.0001 0.0001"
-          rotation="0 0 0"
+          position=" -1 0.3 2"
+          scale="0.0004 0.0004 0.0004"
+          rotation="0 45 0"
           animation-mixer
-          animation__fly="property: position; to:0.2 0.4 -0.09; dur:18000; dir:alternate; startEvents: flying"
-          animation__flyfront="property: position; to:0.3 0.4 4; dur:12000; dir:alternate; startEvents: flyfront"></a-entity>
+          animation__fly="property: position; to:0.1 0.4 -0.9; dur:12000; loop: false; startEvents: flying"
+          animation__flyfront="property: position; to:0.1 0.4 -0.09; dur:12000; resumeEvents; startEvents:flyingfront"
+          animation__flyrotate="property: rotation; to:0 0 0; dur:1000; resumeEvents; startEvents:phoenixrotation"
+          animation__flyscal="property: scale; to :0.0005 0.0005 0.0005; dur:18000; resumeEvents; startEvents:phoenixscale"></a-entity>
 
       </a-entity>
 
@@ -136,9 +138,11 @@
         div.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
         debugBox.appendChild(div);
         debugBox.scrollTop = debugBox.scrollHeight;
+  
       }
-
-      debugLog("Script started");
+      const params = new URLSearchParams(window.location.search);
+      const value = params.get("urll");
+      debugLog(value);
 
       // ---------- Scene Setup ----------
       const sceneEl = document.querySelector("#scene");
@@ -185,9 +189,12 @@
           debugLog("Phoenix flying started");
         });
         
-        phoenix.addEventListener("animationcomplete__flying", () =>{
+        phoenix.addEventListener("animationcomplete__fly", () =>{
+            debugLog("Phoenix finished first flight; Rotating");
+            phoenix.emit("phoenixrotation");
+            phoenix.emit("phoenixscale");
             debugLog("Phoenix finished first flight; switching to flyfront");
-            phoenix.emit("flyfront");
+            phoenix.emit("flyingfront");
           });
 
         // ---------- تعامل کلیک/لمس ----------
