@@ -65,17 +65,17 @@
       <!-- نور محیط -->
       <a-entity light="type: ambient; intensity: 0.8"></a-entity>
 
-      <!-- منابع مدل‌ها -->
+      <!-- منابع مدل‌ها 
       <a-assets>
         <a-asset-item id="minecraft" src="assets/minecraft.glb"></a-asset-item>
         <a-asset-item id="squirrle" src="resources/sq-multi.glb"></a-asset-item>
         <a-asset-item id="tree" src="resources/tree.glb"></a-asset-item>
          <a-asset-item id="phoenix" src="resources/phoenix_bird.glb"></a-asset-item>
-      </a-assets>
+      </a-assets>-->
 
 
-      <a-entity mindar-image-target="targetIndex: 0">
-        <!-- مدل Minecraft -->
+      <a-entity mindar-image-target="targetIndex: 0"; id="target0">
+        <!-- مدل Minecraft 
         <a-entity
           id="test"
           class="clickable"
@@ -87,9 +87,9 @@
           animation__front="property: position; to:0 -0.2 3; dur: 11000; dir: alternate; startEvents: movefrontmine"
           animation__scale="property: scale; to:0.1 0.1 0.1; dur: 11000; dir: alternate; startEvents: scalemine"
           >
-        </a-entity>
+        </a-entity>-->
 
-        <!-- مدل Squirrel -->
+        <!-- مدل Squirrel 
         <a-entity
           id="t2"
           class="clickable"
@@ -99,18 +99,18 @@
           scale=" 1.1 1.1 1.1"        
           animation__right="property: position; to: 0.27 -0.4 0; dur: 18000; startEvents: moveright"
           animation__front="property: rotation; to:5.354 0 13; dur: 8000; dir: alternate; startEvents: movefront">
-        </a-entity>
+        </a-entity>-->
 
-        <!-- tree model -->
+        <!-- tree model
         <a-entity
           id="t1"
           gltf-model="#tree"
           position="0.2 -0.4 0"
           rotation="0 290 0"
           scale="0.3 0.5 0.3">
-        </a-entity>
+        </a-entity> -->
 
-        <!-- phoenix_bird -->
+        <!-- phoenix_bird 
          <a-entity 
           id="phoenix_bird"
           gltf-model="#phoenix"
@@ -121,14 +121,13 @@
           animation__fly="property: position; to:0.1 0.4 -0.9; dur:12000; loop: false; startEvents: flying"
           animation__flyfront="property: position; to:0.1 0.4 -0.09; dur:12000; resumeEvents; startEvents:flyingfront"
           animation__flyrotate="property: rotation; to:0 0 0; dur:1000; resumeEvents; startEvents:phoenixrotation"
-          animation__flyscal="property: scale; to :0.0005 0.0005 0.0005; dur:18000; resumeEvents; startEvents:phoenixscale"></a-entity>
+          animation__flyscal="property: scale; to :0.0005 0.0005 0.0005; dur:18000; resumeEvents; startEvents:phoenixscale"></a-entity>-->
 
       </a-entity>
 
     </a-scene>
 
     <script>
-
       
       // ---------- Debug Logger ----------
       const debugBox = document.getElementById("debug-box");
@@ -148,114 +147,201 @@
       const sceneEl = document.querySelector("#scene");
       sceneEl.addEventListener("loaded", () => {
         debugLog("Scene loaded. Setting up raycaster...");
+      
+        const target0=document.querySelector("#target0");
 
         const camera = sceneEl.camera;
         const raycaster = new THREE.Raycaster();
         const mouse = new THREE.Vector2();
 
-        // مدل‌ها
-        const minecraft = document.querySelector("#test");
-        const squirrel = document.querySelector("#t2");
-        const tree1 = document.querySelector("#t1");
-        const phoenix = document.querySelector("#phoenix_bird");
+        // 1️⃣ Get dynamic model URL (example: query param ?modelUrl=...)
+        const params = new URLSearchParams(window.location.search);
+        const mUrl = params.get("murl") || "resources/sq-multi.glb";
 
-        const clips = ["idle", "punch", "walk", "run"];
-        const clipsq = ["rig|idle-1", "rig|walk-03_remap"];
+        // load modeles in js 
+        const models=[
+          {
+            id:"phoenix_bird",
+            src:'resources/phoenix_bird.glb',
+            position:" -1 0.3 2",
+            scale:"0.0004 0.0004 0.0004",
+            rotation:"0 45 0",
+            "animation-mixer": "clip: *",
+            Animation:[
+              {name:"fly", value:"property: position; to:0.1 0.4 -0.9; dur:12000; loop: false; startEvents: flying"},
+              {name:"flyfront", value:"property: position; to:0.1 0.4 -0.09; dur:12000; resumeEvents; startEvents:flyingfront"},
+              {name:"flyrotate", value:"property: rotation; to:0 0 0; dur:1000; resumeEvents; startEvents:phoenixrotation"},
+              {name:"flyscale", value:"property: scale; to :0.0005 0.0005 0.0005; dur:18000; resumeEvents; startEvents:phoenixscale"},
+            ]
+          },
 
-        let index = 0;
-        let moveIndex = 0;
+          {
+            id:"t2",
+            class:"clickable",
+            src: mUrl,
+            position:"-0.23 -0.38 0",
+            rotation:"5.354 70 12.784",
+            scale:" 1.1 1.1 1.1",
+            Animation:[
+            {name:"right", value :"property: position; to: 0.27 -0.4 0; dur: 18000; startEvents: moveright"},
+            {name:"front", value:"property: rotation; to:5.354 0 13; dur: 8000; dir: alternate; startEvents: movefront"},
+            ]
+          },
 
-        // tree model moded log
-        tree1.addEventListener("model-loaded", () => {
-          debugLog("tree model loaded");
-        });
+          {
+            id:"test",
+            class:"clickable",
+            src:'assets/minecraft.glb',
+            position:"-0.1 -0.2 -0.3",
+            rotation:"-30 180 0",
+            scale:"0.1 0.1 0.1",
+            rotation:"0 180 0",
+            Animation:[
+              {name:"front", value:"property: position; to:0 -0.2 3; dur: 11000; dir: alternate; startEvents: movefrontmine"},
+              {name:"scale", value:"property: scale; to:0.1 0.1 0.1; dur: 11000; dir: alternate; startEvents: scalemine"},
+          ]
+          },
 
-        // وقتی مدل Minecraft آماده شد
-        minecraft.addEventListener("model-loaded", () => {
-          minecraft.setAttribute("animation-mixer", "clip: idle");
-          debugLog("Minecraft model loaded");
-        });
+          {
+            id:"t1",
+            src:'resources/tree.glb',
+            position:"0.2 -0.4 0",
+            rotation:"0 290 0",
+            scale:"0.3 0.5 0.3",
+          },
+        ];
 
-        phoenix.setAttribute('visible', 'false');
-        debugLog("phoenix visible is false");
+        models.forEach(item =>{
+          const entity = document.createElement("a-entity");
 
-        // squirrel model
-        squirrel.addEventListener("model-loaded", ()=> {
-          squirrel.setAttribute("animation-mixer", "clip: rig|idle-1");
-          debugLog("squirrell model loaded");
-          phoenix.setAttribute('visible', 'true');
-          debugLog("phoenix model loaded");
-          phoenix.emit("flying");
-          debugLog("Phoenix flying started");
-        });
-        
-        phoenix.addEventListener("animationcomplete__fly", () =>{
-            debugLog("Phoenix finished first flight; Rotating");
-            phoenix.emit("phoenixrotation");
-            phoenix.emit("phoenixscale");
-            debugLog("Phoenix finished first flight; switching to flyfront");
-            phoenix.emit("flyingfront");
+          entity.setAttribute("id",item.id);
+          entity.setAttribute("gltf-model",item.src);
+          entity.setAttribute("class",item.class);
+          entity.setAttribute("position",item.position);
+          entity.setAttribute("rotation",item.rotation);
+          entity.setAttribute("scale",item.scale);
+
+          if (item["animation-mixer"]) {
+            entity.setAttribute("animation-mixer", item["animation-mixer"]);
+          }
+
+          if (item.Animation && Array.isArray(item.Animation)) {
+            item.Animation.forEach(anim => {
+              entity.setAttribute(`animation__${anim.name}`, anim.value);
+            });
+          }
+
+          target0.appendChild(entity);
+          console.log("Model created:", entity);
           });
 
-        // ---------- تعامل کلیک/لمس ----------
-        function handleInteraction(event) {
-          const rect = sceneEl.canvas.getBoundingClientRect();
-          const x = event.touches ? event.touches[0].clientX : event.clientX;
-          const y = event.touches ? event.touches[0].clientY : event.clientY;
+        
 
-          mouse.x = ((x - rect.left) / rect.width) * 2 - 1;
-          mouse.y = -((y - rect.top) / rect.height) * 2 + 1;
 
-          raycaster.setFromCamera(mouse, camera);
-          const intersects = raycaster.intersectObjects(sceneEl.object3D.children, true);
+           // مدل‌ها
+          const minecraft = document.querySelector("#test");
+          const squirrel = document.querySelector("#t2");
+          const tree1 = document.querySelector("#t1");
+          const phoenix = document.querySelector("#phoenix_bird");
 
-          if (intersects.length > 0) {
-            const target = intersects[0].object.el;
-            if (!target) return;
-            debugLog(`Tapped: ${target.id}`);
+          const clips = ["idle", "punch", "walk", "run"];
+          const clipsq = ["rig|idle-1", "rig|walk-03_remap"];
 
-            // Minecraft
-            if (target.id === "test") {
-              index = (index + 1) % clips.length;
-              const clip = clips[index];
-              minecraft.setAttribute("animation-mixer", `clip: ${clip}`);
-              if (clip === "walk") {
-                minecraft.emit("movefrontmine");
-                minecraft.emit("scalemine");
-                debugLog("Minecraft → movefrontmine");
+          let index = 0;
+          let moveIndex = 0;
+
+          // tree model moded log
+          tree1.addEventListener("model-loaded", () => {
+            debugLog("tree model loaded");
+          });
+
+          // وقتی مدل Minecraft آماده شد
+          minecraft.addEventListener("model-loaded", () => {
+            minecraft.setAttribute("animation-mixer", "clip: idle");
+            debugLog("Minecraft model loaded");
+          });
+
+          phoenix.setAttribute('visible', 'false');
+          debugLog("phoenix visible is false");
+
+          // squirrel model
+          squirrel.addEventListener("model-loaded", ()=> {
+            squirrel.setAttribute("animation-mixer", "clip: rig|idle-1");
+            debugLog("squirrell model loaded");
+            phoenix.setAttribute('visible', 'true');
+            debugLog("phoenix model loaded");
+            phoenix.emit("flying");
+            debugLog("Phoenix flying started");
+          });
+          
+          phoenix.addEventListener("animationcomplete__fly", () =>{
+              debugLog("Phoenix finished first flight; Rotating");
+              phoenix.emit("phoenixrotation");
+              phoenix.emit("phoenixscale");
+              debugLog("Phoenix finished first flight; switching to flyfront");
+              phoenix.emit("flyingfront");
+            });
+
+          // ---------- تعامل کلیک/لمس ----------
+          function handleInteraction(event) {
+            const rect = sceneEl.canvas.getBoundingClientRect();
+            const x = event.touches ? event.touches[0].clientX : event.clientX;
+            const y = event.touches ? event.touches[0].clientY : event.clientY;
+
+            mouse.x = ((x - rect.left) / rect.width) * 2 - 1;
+            mouse.y = -((y - rect.top) / rect.height) * 2 + 1;
+
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(sceneEl.object3D.children, true);
+
+            if (intersects.length > 0) {
+              const target = intersects[0].object.el;
+              if (!target) return;
+              debugLog(`Tapped: ${target.id}`);
+
+              // Minecraft
+              if (target.id === "test") {
+                index = (index + 1) % clips.length;
+                const clip = clips[index];
+                minecraft.setAttribute("animation-mixer", `clip: ${clip}`);
+                if (clip === "walk") {
+                  minecraft.emit("movefrontmine");
+                  minecraft.emit("scalemine");
+                  debugLog("Minecraft → movefrontmine");
+                }
+                debugLog(`Minecraft animation: ${clip}`);
               }
-              debugLog(`Minecraft animation: ${clip}`);
+
+              // squirrel
+              if (target.id === "t2") { 
+                squirrel.setAttribute("animation-mixer", `clip:rig|walk-03_remap`);
+                squirrel.emit("moveright");
+                debugLog(`Minecraft animation: moveright`);
+              }
+
+              squirrel.addEventListener("animationcomplete__right",()=>{
+                debugLog("animation move to right completed");
+                squirrel.setAttribute("animation__fade",{
+                  property:"scale",
+                  to:"0 0 0",
+                  dur:3000,
+                  easing: "easeInOutSine"
+                });
+    
+                squirrel.addEventListener("animationcomplete__fade",()=>{
+                  squirrel.parentNode.removeChild(squirrel);
+                  debugLog("removed");
+                });
+              });
             }
-
-            // squirrel
-            if (target.id === "t2") { 
-              squirrel.setAttribute("animation-mixer", `clip:rig|walk-03_remap`);
-              squirrel.emit("moveright");
-              debugLog(`Minecraft animation: moveright`);
-             }
-
-             squirrel.addEventListener("animationcomplete__right",()=>{
-              debugLog("animation move to right completed");
-              squirrel.setAttribute("animation__fade",{
-                property:"scale",
-                to:"0 0 0",
-                dur:3000,
-                easing: "easeInOutSine"
-              });
-  
-              squirrel.addEventListener("animationcomplete__fade",()=>{
-                squirrel.parentNode.removeChild(squirrel);
-                debugLog("removed");
-              });
-             });
           }
-        }
 
-        // فقط یک شنونده (تا دوبار اجرا نشود)
-        sceneEl.addEventListener("click", handleInteraction);
+          // فقط یک شنونده (تا دوبار اجرا نشود)
+          sceneEl.addEventListener("click", handleInteraction);
 
-        debugLog("Raycaster ready (click supported).");
-      });
+          debugLog("Raycaster ready (click supported).");
+        });
+        
     </script>
   </body>
 </html>
