@@ -24,7 +24,7 @@ app.use('/targets', express.static(path.join(__dirname, 'targets')));
 // Load SSL certificates
 const options = {
   key: fs.readFileSync('./certs/server.key'),
-  cert: fs.readFileSync('./certs/server.crt'),
+  cert: fs.readFileSync('./certs/server.cert'),
 };
 
 // Create HTTPS server
