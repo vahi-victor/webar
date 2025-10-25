@@ -1,1 +1,0 @@
-http-server -S -C server.cert -K server.key
